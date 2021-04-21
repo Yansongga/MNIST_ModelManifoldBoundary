@@ -53,23 +53,6 @@ net = FC().to(args['dev'])
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 
-
-#pre-train model
-#for epoch in range(args['epochs']):  # loop over the dataset multiple times
-#    train_epoch( args, net, optimizer, trainloader )
- #   if (epoch + 1) % 100 == 0:
-#        test(args, net, testloader)
- 
-#print('Finished Training')
-
-####save pretrained model
-#torch.save(
- #   net.state_dict(), 
-#                   os.path.join(save_models_path, 
-#                               'FCNet={}.pth'.format( 'MNIST' )  
-#                               )
-#)
-
 #load pre-trained model
 net.load_state_dict(
     torch.load(
@@ -160,3 +143,20 @@ pdnumsqr2 = pd.DataFrame(d2)
 sns.set(style='darkgrid')
 sns.lineplot(x='eigen order', y='log MMB eigen value', data=pdnumsqr)
 sns.lineplot(x='eigen order', y='log eigen value', data=pdnumsqr2)
+
+
+#pre-train model
+#for epoch in range(args['epochs']):  # loop over the dataset multiple times
+#    train_epoch( args, net, optimizer, trainloader )
+ #   if (epoch + 1) % 100 == 0:
+#        test(args, net, testloader)
+ 
+#print('Finished Training')
+
+####save pretrained model
+#torch.save(
+ #   net.state_dict(), 
+#                   os.path.join(save_models_path, 
+#                               'FCNet={}.pth'.format( 'MNIST' )  
+#                               )
+#)
