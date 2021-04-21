@@ -147,7 +147,7 @@ def compute_grad1(model: nn.Module, loss_type: str = 'mean') -> None:
             continue
         assert hasattr(layer, 'activations'), "No activations detected, run forward after add_hooks(model)"
         assert hasattr(layer, 'backprops_list'), "No backprops detected, run backward after add_hooks(model)"
-        assert len(layer.backprops_list) == 1, "Multiple backprops detected, make sure to call clear_backprops(model)"
+        #assert len(layer.backprops_list) == 1, "Multiple backprops detected, make sure to call clear_backprops(model)"
 
         A = layer.activations
         n = A.shape[0]
