@@ -1,3 +1,6 @@
+Model Reduction by Model manifold Boundary
+
+Reference https://github.com/cybertronai/autograd-hacks.git
 # autograd-hacks
 
 Extract useful quantities from PyTorch autograd
@@ -17,12 +20,3 @@ for param in model.parameters():
   assert(torch.allclose(param.grad1.mean(dim=0), param.grad))
 ```
 
-
-## Hessians
-(assuming ReLU activations, oherwise produces Gauss-Newton matrix)
-
-```
-autograd_hacks.backprop_hess(model(data), hess_type='CrossEntropy')
-autograd_hacks.compute_hess(model)
-print(param.hess)  # print Hessian of param
-```
