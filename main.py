@@ -24,7 +24,7 @@ args = {
     'test_batch_size': 1000, 
     'epochs': 2000,
     'k_size': 1000,
-    'eigen': 10,
+    'eigen': 10,    #reducing the kernel matrix rank 
 }
 #saving model path
 save_models_path = './models_MNIST'
@@ -33,9 +33,6 @@ check_mkdir(save_models_path)
 #saving data path
 save_results_path = './results_MMB'
 check_mkdir(save_results_path)
-
-
-# In[47]:
 
 
 trainset_all = torchvision.datasets.MNIST('./', transform=transforms.ToTensor(), download=True, train=True)
@@ -51,19 +48,13 @@ testloader = torch.utils.data.DataLoader(testset, batch_size=args['test_batch_si
                                          shuffle=False, num_workers=2)
 kloader = torch.utils.data.DataLoader(trainset, batch_size=args['k_size'],
                                          shuffle=False, num_workers=2)
-
-#optimizer = optim.Adam(m.parameters(), lr=args['lr']/10.0,
-  #                     weight_decay=args['wd'])
-    
 criterion = nn.CrossEntropyLoss()
 net = FC().to(args['dev'])
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 
-# In[48]:
 
-
-#train model
+#pre-train model
 #for epoch in range(args['epochs']):  # loop over the dataset multiple times
 #    train_epoch( args, net, optimizer, trainloader )
  #   if (epoch + 1) % 100 == 0:
@@ -85,24 +76,16 @@ net.load_state_dict(
         os.path.join(
             save_models_path, 'FCNet={}.pth'.format( 'MNIST_1000' )            
         )))
-
-#load pre-trained model
+test(args, net, testloader)
+#load reduced model 
 #net.load_state_dict(
 #    torch.load(
 #        os.path.join(
  #            save_models_path, 'eigen={}.pth'.format( args['eigen'] )            
 #        )))
 
-test(args, net, testloader)
 
 
-# In[ ]:
-
-
-
-
-
-# In[49]:
 
 
 #model reduction by model manifold boundary
@@ -147,49 +130,8 @@ for epoch in trange(args['epochs'] ):
         print('\nEigenvalue: {:.4f}. \n'.format( w[args['eigen'] - 1 ] ))
 
 
-# In[53]:
 
-
-a = torch.rand(3, 3)
-a
-#torch.flip(a, dims=[1])
-
-
-# In[54]:
-
-
-torch.flip(a, dims=[1])
-
-
-# In[10]:
-
-
-#w1, v1 = w0, v0 
-w2, v2 = w0, v0 
-
-
-# In[16]:
-
-
-w1[990: 1000]
-
-
-# In[17]:
-
-
-w2[990: 1000]
-
-
-# In[18]:
-
-
-w1_inv,  w2_inv= torch.flip(w1, dims=[0]), torch.flip(w2, dims=[0])
-
-
-# In[5]:
-
-
-## save model manifold boundary 
+## save reduced model 
 #torch.save(
 #    net.state_dict(), 
 #                   os.path.join(save_models_path, 
@@ -198,34 +140,16 @@ w1_inv,  w2_inv= torch.flip(w1, dims=[0]), torch.flip(w2, dims=[0])
 #)
 
 
-# In[40]:
 
 
-test(args, net, trainloader)
-
-
-# In[ ]:
-
-
-
-
-
-# In[8]:
-
-
-
-
-
-# In[39]:
-
-
+#plot log eigenvalue 
 import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
 
-num = np.array([k+1 for k in range(0,1000)])
-sqr = w1_inv[0:1000].log().cpu().numpy()
-sqr2 = w2_inv[0:1000].log().cpu().numpy()
+num = np.array([k+1 for k in range(0,args['datasize'])])
+sqr = w[0:args['datasize']].log().cpu().numpy()
+sqr2 = w0[0:args['datasize']].log().cpu().numpy()
 
 # convert to pandas dataframe
 d = {'eigen order': num, 'log MMB eigen value': sqr }
@@ -236,52 +160,3 @@ pdnumsqr2 = pd.DataFrame(d2)
 sns.set(style='darkgrid')
 sns.lineplot(x='eigen order', y='log MMB eigen value', data=pdnumsqr)
 sns.lineplot(x='eigen order', y='log eigen value', data=pdnumsqr2)
-
-
-# In[31]:
-
-
-import seaborn as sns
-import matplotlib.pyplot as plt
-#titanic = sns.load_dataset("titanic")
-sns.countplot(x='eigen order', data=pdnumsqr, palette="Greens_d")
-plt.show()
-
-
-# In[ ]:
-
-
-
-
-
-# In[27]:
-
-
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-
-#sns.set_theme(style="ticks")
-
-#diamonds = sns.load_dataset("diamonds")
-
-f, ax = plt.subplots(figsize=(7, 5))
-sns.despine(f)
-
-sns.histplot(
-    diamonds,
-    x='eigen order', hue='eigen value',
-    multiple="stack",
-    palette="light:m_r",
-    edgecolor=".3",
-    linewidth=.5,
-    log_scale=True,
-)
-ax.xaxis.set_major_formatter(mpl.ticker.ScalarFormatter())
-ax.set_xticks([50, 100, 200, 500, 1000])
-
-
-# In[ ]:
-
-
-
-
